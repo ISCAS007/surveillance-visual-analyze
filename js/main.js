@@ -1,0 +1,3 @@
+/*
+the meanning main.c for c is the same with main.js for js
+*/
