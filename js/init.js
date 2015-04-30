@@ -3,58 +3,52 @@ init js
 define global var
 define function must use global var
 */
-
-var width = 960,
-    height = 700,
-    radius = Math.min(width, height) / 2,
-	color=d3.scale.category20c();
+var svgwidth = 960,svgheight = 700;
+var margin = new Array();
+var width=new Array();
+var height=new Array();
+var origin=new Array();
+for(i=0;i<4;i++)
+{
+	margin[i]={top: 20, right: 20, bottom: 30, left: 40};
+	width[i]=svgwidth/2-margin[i].left-margin[i].right;
+	height[i]=svgheight/2-margin[i].top-margin[i].bottom;
+	j=i&1;
+	k=i&2;
+	origin[i]=new Object;
+	origin[i].x=j*(svgwidth/2);
+	origin[i].y=k*(svgheight/4);
+}
 	
 var svg=d3.select("body").append("svg")
-	.attr("width",width)
-	.attr("height",height)
-	.append("g")
-	.attr("transform","translate("+width/2+","+height*0.52+")");
-	
-var arc=d3.svg.arc()
-	.startAngle(function(d){return d.x;})
-	.endAngle(function(d){return d.x+d.dx;})
-	.innerRadius(function(d){return Math.sqrt(d.y);})
-	.outerRadius(function(d){return Math.sqrt(d.y+d.dy);});
-	
-var partition=d3.layout.partition()
-	.sort(null)
-	.size([2*Math.PI,radius*radius])
-	.value(function(d){return 1;});
+	.attr("width",svgwidth*2)
+	.attr("height",svgheight*2)
+	.append("g");
 
-var data=new Array(10);
-for(i=0;i<10;i++)
+var g=new Array();
+for(i=0;i<4;i++)
 {
-	data[i]=new Object();
-	data[i].value=Math.floor(Math.random()*10);
-	data[i].depth=0;
-	num=3+Math.floor(Math.random()*3);
-	data[i].children=new Array();
-	for(j=0;j<num;j++)
-	{
-		data[i].children[j]=new Object();
-		data[i].children[j].depth=1;
-		data[i].children[j].value=Math.floor(Math.random()*10);
-		//data[i].children.children=null;
-	}
+	g[i]=svg.append("g").attr("id","g"+i)
+		.attr("width",svgwidth/2)
+		.attr("height",svgheight/2)
+		.attr("transform", "translate("+origin[i].x+"," + origin[i].y + ")");
+	g[i].append("rect")
+		.attr("class","boundary")
+		.attr("width",svgwidth/2-1)
+		.attr("height",svgheight/2-1);
 }
 
-nodes=partition.nodes(data);
-
-var path=svg.selectAll("path")
-	.data(partition.nodes(data))
-	.enter()
-	.append("path")
-	.attr("d",arc)
-	.attr("display","block")
-	.style("stroke","#fff")
-	.style("fill",function(d){return color(d.value);})
-	.style("fill-rule","evenodd");
+svg.append("rect")
+	.attr("width",svgwidth)
+	.attr("height",svgheight)
+	.attr("class","svg");
 	
+drawg0(g[0],width,height);
+drawg1(g[1],width,height);
+drawg2(g[2],width,height);
+drawg3(g[3],width,height);
+	
+
 //var nodes=partition(data).nodes;
 //console.log(nodes);
 	

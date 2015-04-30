@@ -1,0 +1,30 @@
+rect{
+	/* x: 0px;
+	y: 0px; */
+}
+rect.svg{
+	fill: #ddd;
+	opacity: 0.1;
+}
+rect.boundary{
+	fill: #0d0;
+  opacity: 0.3;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #fff;
+}
+
+g{
+	/* z-index: 10; */
+}
+#player{
+	/*z-index: 20;*/
+	position:absolute;
+	left: 50px;
+	top: 50px; 
+	opacity:1;
+	visibility:visible;
+}
