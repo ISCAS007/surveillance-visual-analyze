@@ -3,6 +3,7 @@ init js
 define global var
 define function must use global var
 */
+
 var svgwidth = 960,svgheight = 700;
 var margin = new Array();
 var width=new Array();
@@ -47,8 +48,6 @@ drawg0(g[0],width,height);
 drawg1(g[1],width,height);
 drawg2(g[2],width,height);
 drawg3(g[3],width,height);
-	
 
-//var nodes=partition(data).nodes;
-//console.log(nodes);
+/* global jesture object and funciton */
 	

@@ -34,9 +34,10 @@ function drawg0(g,width,height)
 
 function drawg1(g,width,height)
 {
-	var radius = Math.min(width[1],height[1])/4;
+	var radius = Math.min(width[1],height[1])/2;
 	var	color=d3.scale.category20c();
-
+	var rad = Math.min(width, height) / Math.PI - 25;
+	
 	var arc=d3.svg.arc()
 		.startAngle(function(d){return d.x;})
 		.endAngle(function(d){return d.x+d.dx;})
@@ -65,24 +66,51 @@ function drawg1(g,width,height)
 			//data[i].children.children=null;
 		}
 	}
-
-	var root=new Object();
-	root.children=data;
-	root.key=1;
-
-	//nodes=partition.nodes(data);
-
+	
+	tranx=width[1]/2;
+	trany=height[1]/2;
 	sunburst=g.append("g")
+				.attr("class","g1 sunburst")
 				.attr("transform", "translate("+width[1]/2+"," + height[1]/2 + ")");
-				
-	var path=sunburst.datum(root).selectAll("path")
-		  .data(partition.nodes)
-		.enter().append("path")
-		  .attr("display", function(d) { return d.depth ? null : "none"; }) // hide inner ring
-		  .attr("d", arc)
-		  .style("stroke", "#fff")
-		  .style("fill", function(d) { return color((d.children ? d : d.parent).key); })
-		  .style("fill-rule", "evenodd");
+		
+	//var root=new Object();
+	//root.children=data;
+	//root.key=1;
+	
+	d3.json("json/testData2.json", function(error, root) {
+		var jes=new jesture();
+		var path=sunburst.datum(root).selectAll("path")
+				.data(partition.nodes)
+				.enter()
+				.append("path")
+				.attr("display", function(d) { return d.depth ? null : "none"; }) // hide inner ring
+				.attr("d", arc)
+				.attr("class","g1_arc")
+				.style("stroke", "#fff")
+				.style("fill", function(d) { return color((d.children ? d : d.parent).name); })
+				.style("fill-rule", "evenodd")
+				.on("click",jes.singleclick(1,g))
+				.on("dblclick",jes.doubleclick(1,g))
+				.on("mouseover",jes.mouseover(1,g))
+				.on("mouseleave",jes.mouseleave(1,g));
+		
+	
+		/* var text=sunburst.datum(root).selectAll("text")
+				.data(partition.nodes)
+				.enter()
+				.append("text")
+				.attr("transform", function (a) {
+					var r = 180 * ((a.x + a.dx / 2 - Math.PI / 2) / Math.PI);
+					return "rotate(" + r + ")"
+				})
+				.attr("x", function (a) { return a.x})
+				.attr("dx", "6").attr("dy", ".1em").text(function (a) { return a.name })
+				.attr("display", function (a) { return a.children ? null : "none" })
+				.on("mouseover", jes.mouseover(1,g))
+				.on("mouseleave", jes.mouseleave(1,g));  */
+	});
+		
+	
 }
 
 function drawg2(g,width,height)
@@ -233,3 +261,124 @@ function drawg3(g,width,height)
 		.attr("fill","#f00");
 }
 
+function jesture()
+{
+this.singleclick=singleclick;
+this.doubleclick=doubleclick;
+this.add=add;
+this.jesDelete=jesDelete;
+this.lineSelect=lineSelect;
+this.circleSelect=circleSelect;
+this.annotate=annotate;
+this.back=back;
+this.mouseover=mouseover;
+this.mouseleave=mouseleave;
+function mouseover(gnum,g)
+{
+	
+}
+function mouseleave(gnum,g)
+{
+	
+}
+function singleclick(gnum,g)
+{
+
+}
+function doubleclick(gnum,g)
+{
+
+}
+function add(gnum,g)
+{
+
+}
+function jesDelete(gnum,g)
+{
+
+}
+function lineSelect(gnum,g)
+{
+
+}
+function circleSelect(gnum,g)
+{
+
+}
+function annotate(gnum,g)
+{
+
+}
+function back(gnum,g)
+{
+	
+}
+}
+
+function result2action(result,from,to,center)
+{
+	jes=jesture();
+	console.log(result.Name);
+	switch(result.Name){
+	case "triangle":
+	{
+		break;
+	}
+	case "rectangle":
+	{
+		break;
+	}
+	case "circle":
+	{
+		jes.circleSelect();
+		break;
+	}
+	case "x":
+	{
+		break;
+	}
+	case "zig-zag":
+	{
+		
+		break;
+	}
+	case "check":{
+		
+		break;
+	}
+	case "caret":
+	case "arrow":
+	{
+		break;
+	}
+	case "left square bracket":
+	case "right square bracket":
+	{
+		jes.lineSelect();
+		break;
+	}
+	case "v":
+	{
+		jes.add();
+		break;
+	}
+	case "delete":
+	{
+		jes.jesDelete();
+		break;
+	}
+	case "left curly brace":
+	case "right curly brace":
+	{
+		jes.annotate();
+		break;
+	}
+	case "star":
+	case "pigtail":
+	{
+		break;
+	}
+	default:
+		return;
+	}
+}

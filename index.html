@@ -3,10 +3,14 @@
 <meta content="text/html; charset=UTF-8" http-equiv="content-type">
 <title>surveillance visual analyze</title>
 <link rel="stylesheet" type="text/css" href="css/main.css" />
+<script src="js/dollar.js"></script>
+<script src="js/gesture.js"></script>
 <script src="js/d3.v3.min.js"></script>
 <script src="js/function.js"></script>
 </head>
-<body>
+<body onload="onLoadEvent()" onmousedown="mouseDownEvent(event.clientX, event.clientY)"
+					onmousemove="mouseMoveEvent(event.clientX, event.clientY,event)"
+					onmouseup="mouseUpEvent(event.clientX, event.clientY)">
 <br>
 <script src="js/init.js"></script>
 <script src="js/main.js"></script>
