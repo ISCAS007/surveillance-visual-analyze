@@ -68,8 +68,10 @@ function mouseUpEvent(x, y)
 		{
 			//var result = _r.Recognize(_points,document.getElementById('useProtractor').checked);
 			var from,to;
-			var translate=zoom.translate();
-			var scale=zoom.scale();
+			//var translate=zoom.translate();
+			// var scale=zoom.scale();
+			var translate=[0,0];
+			var scale=1;
 			from=new Point((_points[0].X-translate[0])/scale,(_points[0].Y-translate[1])/scale);
 			to=new Point((_points[_points.length-1].X-translate[0])/scale,(_points[_points.length-1].Y-translate[1])/scale);
 			var center=Centroid(_points);

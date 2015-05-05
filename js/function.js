@@ -2,6 +2,12 @@
 define js function 
 */
 
+//global var for g1*****
+var globaldata;
+var globalnode;
+var global_g1;
+
+
 function drawg0(g,width,height)
 {
 	/*
@@ -26,49 +32,121 @@ function drawg0(g,width,height)
 		.attr("height",height[0]+"px")
 		.append("video")
 		.attr("id","video")
+		.attr("width",width[0]+"px")
+		.attr("height",height[0]+"px")
 		.attr("controls","controls")
-		.attr("poster","pic/demo.jpg")
-		.attr("src","video/demo.mp4")
+		//.attr("poster","pic/demo.jpg")
+		.attr("src","video/14.mp4")
 		.attr("type","video/mp4");
 }
 
+function drawSunburst(sunburst,radius){	
+	var color = d3.scale.category20c();
+	var x = d3.scale.linear()
+		.range([0, 2 * Math.PI]);
+
+	var y = d3.scale.sqrt()
+		.range([0, radius]);
+		
+	var partition = d3.layout.partition()
+		.sort(null)
+		.value(function(d) { return 1; });
+
+	var arc = d3.svg.arc()
+		.startAngle(function(d) { return Math.max(0, Math.min(2 * Math.PI, x(d.x))); })
+		.endAngle(function(d) { return Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx))); })
+		.innerRadius(function(d) { return Math.max(0, y(d.y)); })
+		.outerRadius(function(d) { return Math.max(0, y(d.y + d.dy)); });
+	
+	window.global_g1=new Object();
+	window.global_g1.x=x;
+	window.global_g1.y=y;
+	window.global_g1.arc=arc;
+	window.global_g1.radius=radius;
+	
+	// Keep track of the node that is currently being displayed as the root.
+	var node;
+	
+	d3.json("json/testData2.json", function(error, root) {
+	  
+	  node = root;
+	  window.global_g1.node=node;
+	  window.global_g1.dback=root;
+	  window.global_g1.d=root;
+	  
+	  var path = sunburst.datum(root).selectAll("path")
+		  .data(partition.nodes)
+		.enter().append("path")
+		  .attr("d", arc)
+		  .style("fill", function(d) { return color((d.children ? d : d.parent).name); })
+		  .on("click", click)
+		  .each(stash);
+		  
+	  window.global_g1.path=path;
+	  
+	  function click(d) {
+		window.global_g1.dback=window.global_g1.d;
+		window.global_g1.d=d;
+		node = d;
+		window.global_g1.node=node;
+		
+		path.transition()
+		  .duration(1000)
+		  .attrTween("d", arcTweenZoom(d));
+	  }
+	});
+
+	// d3.select(self.frameElement).style("height", height + "px");
+
+	// Setup for switching data: stash the old values for transition.
+	function stash(d) {
+	  d.x0 = d.x;
+	  d.dx0 = d.dx;
+	}
+
+	// When switching data: interpolate the arcs in data space.
+	function arcTweenData(a, i) {
+	  var oi = d3.interpolate({x: a.x0, dx: a.dx0}, a);
+	  function tween(t) {
+		var b = oi(t);
+		a.x0 = b.x;
+		a.dx0 = b.dx;
+		return arc(b);
+	  }
+	  if (i == 0) {
+	   // If we are on the first arc, adjust the x domain to match the root node
+	   // at the current zoom level. (We only need to do this once.)
+		var xd = d3.interpolate(x.domain(), [node.x, node.x + node.dx]);
+		return function(t) {
+		  x.domain(xd(t));
+		  return tween(t);
+		};
+	  } else {
+		return tween;
+	  }
+}
+
+// When zooming: interpolate the scales.
+function arcTweenZoom(d) {
+  var xd = d3.interpolate(x.domain(), [d.x, d.x + d.dx]),
+      yd = d3.interpolate(y.domain(), [d.y, 1]),
+      yr = d3.interpolate(y.range(), [d.y ? 20 : 0, radius]);
+  return function(d, i) {
+    return i
+        ? function(t) { return arc(d); }
+        : function(t) { x.domain(xd(t)); y.domain(yd(t)).range(yr(t)); return arc(d); };
+  };
+}
+}
+
+
 function drawg1(g,width,height)
 {
+	
 	var radius = Math.min(width[1],height[1])/2;
-	var	color=d3.scale.category20c();
-	var rad = Math.min(width, height) / Math.PI - 25;
-	
-	var arc=d3.svg.arc()
-		.startAngle(function(d){return d.x;})
-		.endAngle(function(d){return d.x+d.dx;})
-		.innerRadius(function(d){return Math.sqrt(d.y);})
-		.outerRadius(function(d){return Math.sqrt(d.y+d.dy);});
-		
-	var partition=d3.layout.partition()
-		.sort(null)
-		.size([2*Math.PI,radius*radius])
-		.value(function(d){return 1;});
 
-	var data=new Array(10);
-	for(i=0;i<10;i++)
-	{
-		data[i]=new Object();
-		data[i].key=2+i;
-		//data[i].depth=0;
-		num=3+Math.floor(Math.random()*3);
-		data[i].children=new Array();
-		for(j=0;j<num;j++)
-		{
-			data[i].children[j]=new Object();
-			
-			//data[i].children[j].depth=1;
-			data[i].children[j].key=10+Math.floor(Math.random()*10);
-			//data[i].children.children=null;
-		}
-	}
-	
-	tranx=width[1]/2;
-	trany=height[1]/2;
+	tranx=width[1]/2+0;
+	trany=height[1]/2+0;
 	sunburst=g.append("g")
 				.attr("class","g1 sunburst")
 				.attr("transform", "translate("+width[1]/2+"," + height[1]/2 + ")");
@@ -77,40 +155,7 @@ function drawg1(g,width,height)
 	//root.children=data;
 	//root.key=1;
 	
-	d3.json("json/testData2.json", function(error, root) {
-		var jes=new jesture();
-		var path=sunburst.datum(root).selectAll("path")
-				.data(partition.nodes)
-				.enter()
-				.append("path")
-				.attr("display", function(d) { return d.depth ? null : "none"; }) // hide inner ring
-				.attr("d", arc)
-				.attr("class","g1_arc")
-				.style("stroke", "#fff")
-				.style("fill", function(d) { return color((d.children ? d : d.parent).name); })
-				.style("fill-rule", "evenodd")
-				.on("click",jes.singleclick(1,g))
-				.on("dblclick",jes.doubleclick(1,g))
-				.on("mouseover",jes.mouseover(1,g))
-				.on("mouseleave",jes.mouseleave(1,g));
-		
-	
-		/* var text=sunburst.datum(root).selectAll("text")
-				.data(partition.nodes)
-				.enter()
-				.append("text")
-				.attr("transform", function (a) {
-					var r = 180 * ((a.x + a.dx / 2 - Math.PI / 2) / Math.PI);
-					return "rotate(" + r + ")"
-				})
-				.attr("x", function (a) { return a.x})
-				.attr("dx", "6").attr("dy", ".1em").text(function (a) { return a.name })
-				.attr("display", function (a) { return a.children ? null : "none" })
-				.on("mouseover", jes.mouseover(1,g))
-				.on("mouseleave", jes.mouseleave(1,g));  */
-	});
-		
-	
+	drawSunburst(sunburst,radius);
 }
 
 function drawg2(g,width,height)
@@ -261,7 +306,7 @@ function drawg3(g,width,height)
 		.attr("fill","#f00");
 }
 
-function jesture()
+function gesture()
 {
 this.singleclick=singleclick;
 this.doubleclick=doubleclick;
@@ -283,7 +328,10 @@ function mouseleave(gnum,g)
 }
 function singleclick(gnum,g)
 {
-
+	if(gnum==1)
+	{
+		
+	}
 }
 function doubleclick(gnum,g)
 {
@@ -311,13 +359,46 @@ function annotate(gnum,g)
 }
 function back(gnum,g)
 {
+	if(gnum==1){
+		click();
+	}
 	
+	function click() {
+		tmp=window.global_g1.dback;
+		window.global_g1.dback=window.global_g1.d;
+		window.global_g1.d=tmp;
+		
+		d=window.global_g1.d;
+		
+		path=window.global_g1.path;
+		path.transition()
+		  .duration(1000)
+		  .attrTween("d", arcTweenZoom(d));
+	}
+	
+	function arcTweenZoom(d) {
+		x=window.global_g1.x;
+		y=window.global_g1.y;
+		arc=window.global_g1.arc;
+		radius=window.global_g1.radius;
+		
+		
+		var xd = d3.interpolate(x.domain(), [d.x, d.x + d.dx]),
+		yd = d3.interpolate(y.domain(), [d.y, 1]),
+		yr = d3.interpolate(y.range(), [d.y ? 20 : 0, radius]);
+		return function(d, i) {
+		return i
+		? function(t) { return arc(d); }
+		: function(t) { x.domain(xd(t)); y.domain(yd(t)).range(yr(t)); return arc(d); };
+		};
+	}
 }
+
 }
 
 function result2action(result,from,to,center)
 {
-	jes=jesture();
+	var jes=gesture();
 	console.log(result.Name);
 	switch(result.Name){
 	case "triangle":
@@ -381,4 +462,15 @@ function result2action(result,from,to,center)
 	default:
 		return;
 	}
+}
+
+function getJsonData()
+{
+	var data;
+	d3.json("json/testData2.json", function(error, root) {
+		window.globaldata=root;
+		data=root;
+	});
+	
+	return data;
 }
