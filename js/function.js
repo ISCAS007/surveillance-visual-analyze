@@ -4,8 +4,7 @@ define js function
 var globaldata;
 var globalnode;
 var global_g1;
-var global_d;
-var dataset;
+var global_g2;
 
 function gesture()
 {
@@ -99,6 +98,9 @@ function back(gnum,g)
 		path.transition()
 		  .duration(1000)
 		  .attrTween("d", arcTweenZoom(d));
+		 
+		 
+		redrawg2();
 	}
 }
 function arcTweenZoom(d) {
@@ -253,6 +255,7 @@ function drawSunburst(sunburst,radius){
 	window.global_g1.y=y;
 	window.global_g1.arc=arc;
 	window.global_g1.radius=radius;
+	window.global_g1.color=color;
 	
 	// Keep track of the node that is currently being displayed as the root.
 	var node;
@@ -265,13 +268,10 @@ function drawSunburst(sunburst,radius){
 	  var tmp2=new Object({"name":"Category4","children":[root.children[3]]});
 	  root.children[3]=tmp2;
 	  
-	  console.log("root is ...");
-	  console.log(root);
 	  node = root;
 	  window.global_g1.node=node;
 	  window.global_g1.dback=root;
 	  window.global_g1.d=root;
-	  global_d=root;
 	  window.globaldata=root;
 	  
 	  var path = sunburst.datum(root).selectAll("path")
@@ -321,6 +321,8 @@ function drawSunburst(sunburst,radius){
 		path.transition()
 		  .duration(1000)
 		  .attrTween("d", arcTweenZoom(d));
+		  
+		redrawg2();
 	  }
 	});
 
@@ -400,8 +402,7 @@ function extractData_yzbx(dd,dataset)
 		var m;
 		var tmp;
 		var len=current.length;
-		console.log("len is "+len);
-		console.log(current);
+
 		for(var i=0;i<len;i++)
 		{
 			tmp=extractData_yzbx(current[i],dataset);
@@ -409,9 +410,7 @@ function extractData_yzbx(dd,dataset)
 			{
 				console.log(current[i]);
 			}
-			console.log("tmp is "+tmp);
-			console.log("i is "+i);
-			console.log("len is "+len);
+			
 			if(i==0)
 			{
 				m=tmp;
@@ -433,12 +432,11 @@ function extractData_yzbx(dd,dataset)
 function drawg2(g,width,height)
 {
 	// console.log(window.global_g1.d);
-	dataset=new Array();
+	var dataset=new Array();
 	var times=extractData_yzbx(global_g1.d,dataset);
 	var count=dataset.length;
-	console.log("times "+times+" count"+count);
-	console.log(dataset);
 	
+	// g.attr("transform","translate("+30+","+10+")");
 	var x = d3.scale.linear()
 		.domain([0, count+1])
 		.range([0,width[2]])
@@ -466,32 +464,26 @@ function drawg2(g,width,height)
 		.attr("transform","translate("+30+","+10+")")
 		// .attr("stroke","#0f0")
 		// .attr("fill","#f00")
-		.call(xAxis);
+		.call(xAxis)
+		.append("text")
+		.attr("class", "label")
+		.attr("x", width[2])
+		.attr("y", height[2]-6)
+		.style("text-anchor", "end")
+		.text("object id");
 
 	g.append("g")
 		.attr("class", "y axis")
 		.attr("transform","translate("+30+","+10+")")
-		.call(yAxis);
-		
-	g.append("text")
-		.attr("x",width[2]-15)
-		.attr("y",height[2]-10)
-		.text("object id");
-		
-	g.append("text")
-		.attr("x",30)
-		.attr("y",20)
+		.call(yAxis)
+		.append("text")
+		.attr("class", "label")
+		.attr("transform", "rotate(-90)")
+		.attr("y", 6)
+		.attr("dy", ".71em")
+		.style("text-anchor", "end")
 		.text("frequency");
 	
-	
-	// var dataset=new Array();
-	// for(i=0;i<10;i++)
-	// {
-		// dataset[i]=new Object();
-		// dataset[i].x=i;
-		// dataset[i].y=Math.random();
-	// }
-
 	var line = d3.svg.line()
 		.interpolate("linear")
 		.x(function(d,i){return x(i);})
@@ -505,8 +497,27 @@ function drawg2(g,width,height)
 		.style("stroke-width",1)
 		.style("stroke","#F00")
 		.style("stroke-opacity",0.9);
-		
+	
+	var color=window.global_g1.color;
+	g.selectAll(".dot")
+		.data(dataset)
+		.enter()
+		.append("circle")
+		.attr("class", "dot")
+		.attr("r", 3.5)
+		.attr("cx", function(d,i) { return x(i); })
+		.attr("cy", function(d) { return y(d.times); })
+		.attr("transform","translate("+30+","+10+")")
+		.style("fill", function(d) { return color(d.name); })
+		.on("click",click)
+		;
+	  
 	console.log("draw g2 ok ...........");
+	
+	function click(d,i)
+	{
+		console.log("g2 clicked "+i);
+	}
 }
 
 function drawg3(g,width,height)
@@ -554,7 +565,7 @@ function drawg3(g,width,height)
 		.text("frequency");
 		
 	var dataset=new Array();
-	for(i=0;i<10;i++)
+	for(var i=0;i<10;i++)
 	{
 		dataset[i]=new Object();
 		dataset[i].x=Math.random()*10;
@@ -588,4 +599,21 @@ function drawg3(g,width,height)
 		})
 		.attr("r",3)
 		.attr("fill","#f00");
+}
+
+function redrawg2(){
+	g[2].remove();
+	
+	var i=2;
+	g[i]=svg.append("g").attr("id","g"+i)
+		.attr("width",svgwidth/2)
+		.attr("height",svgheight/2)
+		.attr("transform", "translate("+origin[i].x+"," + origin[i].y + ")");	
+		
+	g[i].append("rect")
+		.attr("class","boundary")
+		.attr("width",svgwidth/2-1)
+		.attr("height",svgheight/2-1);
+	
+	drawg2(g[2],width,height);
 }

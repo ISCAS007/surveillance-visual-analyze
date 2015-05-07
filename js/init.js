@@ -35,7 +35,7 @@ svg.append("rect")
 	.attr("class","svg");
 	
 var g=new Array();
-for(i=0;i<4;i++)
+for(var i=0;i<4;i++)
 {
 	
 	g[i]=svg.append("g").attr("id","g"+i)
@@ -51,20 +51,5 @@ for(i=0;i<4;i++)
 }
 	
 drawg0(g[0],width,height);
+//g2,g3 need draw after g1, so run drawg2,drawg3 in drawg1.
 drawg1(g[1],width,height);
-
-// console.log(global_g1);
-// console.log(global_d);
-// a=global_g1.d;
-// console.log(a);
-// drawg2(g[2],width,height);
-// drawg3(g[3],width,height);
-
-// svg.append("text")
-	// .attr("id","gesture_tooltip")
-	// .attr("position","fixed")
-	// .text("tooltip...")
-	// .style("left","0px")
-	// .style("bottom","0px");
-/* global gesture object and funciton */
-	
