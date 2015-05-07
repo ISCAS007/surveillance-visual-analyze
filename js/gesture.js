@@ -79,10 +79,11 @@ function mouseUpEvent(x, y)
 			center.X=(center.X-translate[0])/scale;
 			center.Y=(center.Y-translate[1])/scale;
 			console.log(from.X+","+to.X+","+center.X);
+			// console.log(_points);
 			
 			var result = _r.Recognize(_points,false);
 			drawText("Result: " + result.Name + " (" + round(result.Score,2) + ").");
-			result2action(result,from,to,center);
+			result2action(result,from,to,center,_points);
 		}
 		else // fewer than 10 points were inputted
 		{

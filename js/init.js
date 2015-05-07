@@ -9,7 +9,14 @@ var margin = new Array();
 var width=new Array();
 var height=new Array();
 var origin=new Array();
-var jsondata=getJsonData();
+
+//global var for g1*****
+var globaldata;
+var globalnode;
+var global_g1;
+
+getJsonData();
+
 for(i=0;i<4;i++)
 {
 	margin[i]={top: 20, right: 20, bottom: 30, left: 40};
@@ -26,6 +33,7 @@ var svg=d3.select("body").append("svg")
 	.attr("width",svgwidth)
 	.attr("height",svgheight)
 	.append("g");
+
 svg.append("rect")
 	.attr("width",svgwidth)
 	.attr("height",svgheight)
@@ -49,9 +57,17 @@ for(i=0;i<4;i++)
 	
 drawg0(g[0],width,height);
 drawg1(g[1],width,height);
+console.log(window.global_g1);
+a=window.global_g1.d;
+console.log(a);
 drawg2(g[2],width,height);
 drawg3(g[3],width,height);
 
-
+// svg.append("text")
+	// .attr("id","gesture_tooltip")
+	// .attr("position","fixed")
+	// .text("tooltip...")
+	// .style("left","0px")
+	// .style("bottom","0px");
 /* global gesture object and funciton */
 	
