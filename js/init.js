@@ -11,13 +11,8 @@ var height=new Array();
 var origin=new Array();
 
 //global var for g1*****
-var globaldata;
-var globalnode;
-var global_g1;
-
-getJsonData();
-
-for(i=0;i<4;i++)
+// getJsonData();
+for(var i=0;i<4;i++)
 {
 	margin[i]={top: 20, right: 20, bottom: 30, left: 40};
 	width[i]=svgwidth/2-margin[i].left-margin[i].right;
@@ -57,11 +52,13 @@ for(i=0;i<4;i++)
 	
 drawg0(g[0],width,height);
 drawg1(g[1],width,height);
-console.log(window.global_g1);
-a=window.global_g1.d;
-console.log(a);
-drawg2(g[2],width,height);
-drawg3(g[3],width,height);
+
+// console.log(global_g1);
+// console.log(global_d);
+// a=global_g1.d;
+// console.log(a);
+// drawg2(g[2],width,height);
+// drawg3(g[3],width,height);
 
 // svg.append("text")
 	// .attr("id","gesture_tooltip")
