@@ -76,7 +76,6 @@ function drawg3(g, width, height) {
       return y(d.y);
     });
   window.global_g3 = new Object;
-  window.global_g3.tip = tip;
   window.global_g3.line = line;
   window.global_g3.color = window.global_g1.color;
 
